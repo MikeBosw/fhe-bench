@@ -1,18 +1,17 @@
-How long does an FHE multiplication take compared to a non-FHE one?*
+How long does an FHE multiplication take compared to a multiplication in the clear?*
 
-Here is a very dumb, very naive answer: ~75,000x longer.
+The answer is: 40,000,000x longer, running this benchmark on a MacBook M3 Pro.
 
 -----------
 
 ```
-cargo run --color=always --package FHE-test --bin FHE-test --profile release
+cargo run --release
+
     Finished `release` profile [optimized] target(s) in 0.03s
      Running `target/release/FHE-test`
-A random non-FHE value: 12580
+A random non-FHE value: 3938731157540726032
 FHE value: 325
-Diff between normal op and FHE op: 78802x
-
-Process finished with exit code 0
+Diff between normal op (29.3ns) and FHE op (1156ms): 39458390x
 ```
 
-\* on my MacBook M3, and biased in favor of FHE because we include generation of two random numbers in the non-FHE time measurement
+\* biased in favor of FHE because we include generation of two random numbers in the non-FHE time measurement

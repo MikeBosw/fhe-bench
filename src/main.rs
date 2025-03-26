@@ -12,14 +12,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let encrypted_b = FheUint32::try_encrypt(clear_b, &client_key)?;
     let (encrypted_res, fhe_op_time) = benchmark_single_fhe_op(encrypted_a, encrypted_b);
     let clear_res: u64 = encrypted_res.decrypt(&client_key);
-    let (normal_val, normal_nanos_per_op) = benchmark_normal_op();
+    let (normal_val, normal_nanos_per_op) = benchmark_normal_op_nanos();
     let fhe_nanos_per_op = fhe_op_time.as_nanos() as f64;
     // print the non-FHE value to stdout in case not doing so would make it easier to optimize away
     // the computation
     println!("A random non-FHE value: {}", normal_val);
     println!("FHE value: {}", clear_res,);
     println!(
-        "Diff between normal op and FHE op: {}x",
+        "Diff between normal op ({}ns) and FHE op ({}ms): {}x",
+        normal_nanos_per_op,
+        (fhe_nanos_per_op / 1_000_000.0) as u64,
         (fhe_nanos_per_op / normal_nanos_per_op) as u64
     );
 
@@ -27,17 +29,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 
 /** Returns the product of two randomly generated numbers, and the nanos for said computation. */
-fn benchmark_normal_op() -> (u64, f64) {
+fn benchmark_normal_op_nanos() -> (u64, f64) {
     let mut total_time: Duration = Duration::from_secs(0);
     let mut normal_val = 0;
-    const N: i32 = 1;
-    // the higher the N, the worse it looks for FHE, cuz these inner operations get optimized.
-    // the advantage tails off at around N=10,000,000 on my MacBook Pro M3.
-    for _ in 0..N {
+    const N: usize = 10;
+    let rand_vals = (0..=N)
+        .map(|_| rand::random::<u32>() as u64)
+        .collect::<Vec<_>>();
+    // beyond a certain N, the worse it may look for FHE, cuz these inner operations get optimized.
+    // up to a certain N, there might be a higher probability of thread interruption.
+    // the difference tails off at around N=10,000,000 on my MacBook Pro M3.
+    for i in 0..N {
         let new_start_ts = Instant::now();
-        let rand_a = rand::random::<u8>() as u64;
-        let rand_b = rand::random::<u8>() as u64;
-        normal_val = rand_a * rand_b;
+        // we cheat in favor of FHE by:
+        //      (1) using u64s instead of u32s
+        //      (2) including timestamp checks within the inner loop
+        normal_val = rand_vals[i] * rand_vals[i + 1];
         let normal_time: Duration = Instant::now() - new_start_ts;
         total_time += normal_time;
     }
