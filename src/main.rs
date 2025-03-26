@@ -35,6 +35,9 @@ fn benchmark_normal_op() -> (u64, f64) {
     // the advantage tails off at around N=10,000,000 on my MacBook Pro M3.
     for _ in 0..N {
         let new_start_ts = Instant::now();
+        // we cheat in favor of FHE by:
+        //      (1) using u64s instead of u32s
+        //      (2) including random number generation in the time measurement
         let rand_a = rand::random::<u8>() as u64;
         let rand_b = rand::random::<u8>() as u64;
         normal_val = rand_a * rand_b;
