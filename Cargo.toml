@@ -1,0 +1,9 @@
+[package]
+name = "FHE-test"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+tfhe = { version = "*", features = ["boolean", "shortint", "integer"] }
+rand = "0.9.0"
+criterion = "0.5.1"
