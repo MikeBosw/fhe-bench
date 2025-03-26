@@ -19,7 +19,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("A random non-FHE value: {}", normal_val);
     println!("FHE value: {}", clear_res,);
     println!(
-        "Diff between normal op and FHE op: {}x",
+        "Diff between normal op ({}ns) and FHE op ({}ms): {}x",
+        normal_nanos_per_op,
+        (fhe_nanos_per_op/1_000_000.0) as u64,
         (fhe_nanos_per_op / normal_nanos_per_op) as u64
     );
 
