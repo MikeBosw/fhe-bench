@@ -43,7 +43,7 @@ fn benchmark_normal_op_nanos() -> (u64, f64) {
         let new_start_ts = Instant::now();
         // we cheat in favor of FHE by:
         //      (1) using u64s instead of u32s
-        //      (2) including timestamp checks within the inner loop
+        //      (2) including timestamp checks within the inner loop (?)
         normal_val = rand_vals[i] * rand_vals[i + 1];
         let normal_time: Duration = Instant::now() - new_start_ts;
         total_time += normal_time;
