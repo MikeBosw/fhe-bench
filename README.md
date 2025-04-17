@@ -2,6 +2,8 @@ How long does an FHE multiplication take compared to a multiplication in the cle
 
 The answer is: 40,000,000x longer, running this benchmark on a MacBook M3 Pro.
 
+Zama is the library used.
+
 -----------
 
 ```
